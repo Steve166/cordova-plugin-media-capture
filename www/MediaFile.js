@@ -19,9 +19,7 @@
  *
  */
 
-const utils = require('cordova/utils');
 const exec = require('cordova/exec');
-const File = require('cordova-plugin-file.File');
 const CaptureError = require('./CaptureError');
 /**
  * Represents a single file.
@@ -33,10 +31,52 @@ const CaptureError = require('./CaptureError');
  * size {Number} size of the file in bytes
  */
 const MediaFile = function (name, localURL, type, lastModifiedDate, size) {
-    MediaFile.__super__.constructor.apply(this, arguments);
+    this.name = name || '';
+    this.localURL = localURL || null;
+    this.type = type || null;
+    this.lastModified = lastModifiedDate || null;
+    // For backwards compatibility, store the timestamp in lastModifiedDate as well
+    this.lastModifiedDate = lastModifiedDate || null;
+    this.size = size || 0;
+
+    // These store the absolute start and end for slicing the file.
+    this.start = 0;
+    this.end = this.size;
 };
 
-utils.extend(MediaFile, File);
+
+/**
+ * Returns a "slice" of the file. Since Cordova Files don't contain the actual
+ * content, this really returns a File with adjusted start and end.
+ * Slices of slices are supported.
+ * start {Number} The index at which to start the slice (inclusive).
+ * end {Number} The index at which to end the slice (exclusive).
+ */
+File.prototype.slice = function (start, end) {
+    const size = this.end - this.start;
+    let newStart = 0;
+    let newEnd = size;
+    if (arguments.length) {
+        if (start < 0) {
+            newStart = Math.max(size + start, 0);
+        } else {
+            newStart = Math.min(size, start);
+        }
+    }
+
+    if (arguments.length >= 2) {
+        if (end < 0) {
+            newEnd = Math.max(size + end, 0);
+        } else {
+            newEnd = Math.min(end, size);
+        }
+    }
+
+    const newFile = new File(this.name, this.localURL, this.type, this.lastModified, this.size);
+    newFile.start = this.start + newStart;
+    newFile.end = this.start + newEnd;
+    return newFile;
+};
 
 /**
  * Request capture format data for a specific file and type

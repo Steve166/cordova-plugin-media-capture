@@ -31,8 +31,6 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PermissionHelper;
 import org.apache.cordova.PluginManager;
-import org.apache.cordova.file.FileUtils;
-import org.apache.cordova.file.LocalFilesystemURL;
 import org.apache.cordova.mediacapture.PendingRequests.Request;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -490,16 +488,11 @@ public class Capture extends CordovaPlugin {
             } catch (IllegalAccessException e) {
             }
         }
-        FileUtils filePlugin = (FileUtils) pm.getPlugin("File");
-        LocalFilesystemURL url = filePlugin.filesystemURLforLocalPath(fp.getAbsolutePath());
 
         try {
             // File properties
             obj.put("name", fp.getName());
             obj.put("fullPath", Uri.fromFile(fp));
-            if (url != null) {
-                obj.put("localURL", url.toString());
-            }
             // Because of an issue with MimeTypeMap.getMimeTypeFromExtension() all .3gpp files
             // are reported as video/3gpp. I'm doing this hacky check of the URI to see if it
             // is stored in the audio or video content store.
