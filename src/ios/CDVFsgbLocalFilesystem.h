@@ -17,14 +17,16 @@
  under the License.
  */
 
-#import "CDVFile.h"
+#import "CDVFsgbFile.h"
 
-extern NSString* const kCDVAssetsLibraryPrefix;
-extern NSString* const kCDVAssetsLibraryScheme;
-
-@interface CDVAssetLibraryFilesystem : NSObject<CDVFileSystem> {
+@interface CDVLocalFilesystem : NSObject<CDVFsgbFileSystem> {
+    NSString *_name;
+    NSString *_fsRoot;
 }
 
-- (id) initWithName:(NSString *)name;
+- (id) initWithName:(NSString *)name root:(NSString *)fsRoot;
++ (NSString*)getMimeTypeFromPath:(NSString*)fullPath;
+
+@property (nonatomic,strong) NSString *fsRoot;
 
 @end

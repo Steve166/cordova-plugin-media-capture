@@ -17,7 +17,7 @@
  under the License.
  */
 
-#import "CDVFile.h"
+#import "CDVFsgbFile.h"
 #import "CDVAssetLibraryFilesystem.h"
 #import <Cordova/CDV.h>
 #import <AssetsLibrary/ALAsset.h>
@@ -40,22 +40,22 @@ NSString* const kCDVAssetsLibraryScheme = @"assets-library";
    cdvfile://localhost/assets-library/<path>
  */
 
-- (NSURL *)assetLibraryURLForLocalURL:(CDVFilesystemURL *)url
+- (NSURL *)assetLibraryURLForLocalURL:(CDVFsgbFilesystemURL *)url
 {
-    if ([url.url.scheme isEqualToString:kCDVFilesystemURLPrefix]) {
+    if ([url.url.scheme isEqualToString:kCDVFsgbFilesystemURLPrefix]) {
         NSString *path = [[url.url absoluteString] substringFromIndex:[@"cdvfile://localhost/assets-library" length]];
         return [NSURL URLWithString:[NSString stringWithFormat:@"assets-library:/%@", path]];
     }
     return url.url;
 }
 
-- (CDVPluginResult *)entryForLocalURI:(CDVFilesystemURL *)url
+- (CDVPluginResult *)entryForLocalURI:(CDVFsgbFilesystemURL *)url
 {
     NSDictionary* entry = [self makeEntryForLocalURL:url];
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:entry];
 }
 
-- (NSDictionary *)makeEntryForLocalURL:(CDVFilesystemURL *)url {
+- (NSDictionary *)makeEntryForLocalURL:(CDVFsgbFilesystemURL *)url {
     return [self makeEntryForPath:url.fullPath isDirectory:NO];
 }
 
@@ -119,62 +119,62 @@ NSString* const kCDVAssetsLibraryScheme = @"assets-library";
     return self;
 }
 
-- (CDVPluginResult *)getFileForURL:(CDVFilesystemURL *)baseURI requestedPath:(NSString *)requestedPath options:(NSDictionary *)options
+- (CDVPluginResult *)getFileForURL:(CDVFsgbFilesystemURL *)baseURI requestedPath:(NSString *)requestedPath options:(NSDictionary *)options
 {
     // return unsupported result for assets-library URLs
    return [CDVPluginResult resultWithStatus:CDVCommandStatus_MALFORMED_URL_EXCEPTION messageAsString:@"getFile not supported for assets-library URLs."];
 }
 
-- (CDVPluginResult*)getParentForURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult*)getParentForURL:(CDVFsgbFilesystemURL *)localURI
 {
     // we don't (yet?) support getting the parent of an asset
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsInt:NOT_READABLE_ERR];
 }
 
-- (CDVPluginResult*)setMetadataForURL:(CDVFilesystemURL *)localURI withObject:(NSDictionary *)options
+- (CDVPluginResult*)setMetadataForURL:(CDVFsgbFilesystemURL *)localURI withObject:(NSDictionary *)options
 {
     // setMetadata doesn't make sense for asset library files
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
 }
 
-- (CDVPluginResult *)removeFileAtURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult *)removeFileAtURL:(CDVFsgbFilesystemURL *)localURI
 {
     // return error for assets-library URLs
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsInt:INVALID_MODIFICATION_ERR];
 }
 
-- (CDVPluginResult *)recursiveRemoveFileAtURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult *)recursiveRemoveFileAtURL:(CDVFsgbFilesystemURL *)localURI
 {
     // return error for assets-library URLs
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_MALFORMED_URL_EXCEPTION messageAsString:@"removeRecursively not supported for assets-library URLs."];
 }
 
-- (CDVPluginResult *)readEntriesAtURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult *)readEntriesAtURL:(CDVFsgbFilesystemURL *)localURI
 {
     // return unsupported result for assets-library URLs
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_MALFORMED_URL_EXCEPTION messageAsString:@"readEntries not supported for assets-library URLs."];
 }
 
-- (CDVPluginResult *)truncateFileAtURL:(CDVFilesystemURL *)localURI atPosition:(unsigned long long)pos
+- (CDVPluginResult *)truncateFileAtURL:(CDVFsgbFilesystemURL *)localURI atPosition:(unsigned long long)pos
 {
     // assets-library files can't be truncated
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsInt:NO_MODIFICATION_ALLOWED_ERR];
 }
 
-- (CDVPluginResult *)writeToFileAtURL:(CDVFilesystemURL *)localURL withData:(NSData*)encData append:(BOOL)shouldAppend
+- (CDVPluginResult *)writeToFileAtURL:(CDVFsgbFilesystemURL *)localURL withData:(NSData*)encData append:(BOOL)shouldAppend
 {
     // text can't be written into assets-library files
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsInt:NO_MODIFICATION_ALLOWED_ERR];
 }
 
-- (void)copyFileToURL:(CDVFilesystemURL *)destURL withName:(NSString *)newName fromFileSystem:(NSObject<CDVFileSystem> *)srcFs atURL:(CDVFilesystemURL *)srcURL copy:(BOOL)bCopy callback:(void (^)(CDVPluginResult *))callback
+- (void)copyFileToURL:(CDVFsgbFilesystemURL *)destURL withName:(NSString *)newName fromFileSystem:(NSObject<CDVFsgbFileSystem> *)srcFs atURL:(CDVFsgbFilesystemURL *)srcURL copy:(BOOL)bCopy callback:(void (^)(CDVPluginResult *))callback
 {
     // Copying to an assets library file is not doable, since we can't write it.
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsInt:INVALID_MODIFICATION_ERR];
     callback(result);
 }
 
-- (NSString *)filesystemPathForURL:(CDVFilesystemURL *)url
+- (NSString *)filesystemPathForURL:(CDVFsgbFilesystemURL *)url
 {
     NSString *path = nil;
     if ([[url.url scheme] isEqualToString:kCDVAssetsLibraryScheme]) {
@@ -188,7 +188,7 @@ NSString* const kCDVAssetsLibraryScheme = @"assets-library";
     return path;
 }
 
-- (void)readFileAtURL:(CDVFilesystemURL *)localURL start:(NSInteger)start end:(NSInteger)end callback:(void (^)(NSData*, NSString* mimeType, CDVFileError))callback
+- (void)readFileAtURL:(CDVFsgbFilesystemURL *)localURL start:(NSInteger)start end:(NSInteger)end callback:(void (^)(NSData*, NSString* mimeType, CDVFsgbFileError))callback
 {
     ALAssetsLibraryAssetForURLResultBlock resultBlock = ^(ALAsset* asset) {
         if (asset) {
@@ -216,7 +216,7 @@ NSString* const kCDVAssetsLibraryScheme = @"assets-library";
     [assetsLibrary assetForURL:[self assetLibraryURLForLocalURL:localURL] resultBlock:resultBlock failureBlock:failureBlock];
 }
 
-- (void)getFileMetadataForURL:(CDVFilesystemURL *)localURL callback:(void (^)(CDVPluginResult *))callback
+- (void)getFileMetadataForURL:(CDVFsgbFilesystemURL *)localURL callback:(void (^)(CDVPluginResult *))callback
 {
     // In this case, we need to use an asynchronous method to retrieve the file.
     // Because of this, we can't just assign to `result` and send it at the end of the method.

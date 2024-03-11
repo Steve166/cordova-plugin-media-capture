@@ -17,7 +17,7 @@
  under the License.
  */
 
-#import "CDVFile.h"
+#import "CDVFsgbFile.h"
 #import "CDVLocalFilesystem.h"
 #import <Cordova/CDV.h>
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -42,7 +42,7 @@
  *  CDVPluginResult result containing a file or directoryEntry for the localURI, or an error if the
  *   URI represents a non-existent path, or is unrecognized or otherwise malformed.
  */
-- (CDVPluginResult *)entryForLocalURI:(CDVFilesystemURL *)url
+- (CDVPluginResult *)entryForLocalURI:(CDVFsgbFilesystemURL *)url
 {
     CDVPluginResult* result = nil;
     NSDictionary* entry = [self makeEntryForLocalURL:url];
@@ -54,7 +54,7 @@
     }
     return result;
 }
-- (NSDictionary *)makeEntryForLocalURL:(CDVFilesystemURL *)url {
+- (NSDictionary *)makeEntryForLocalURL:(CDVFsgbFilesystemURL *)url {
     NSString *path = [self filesystemPathForURL:url];
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
     BOOL isDir = NO;
@@ -117,24 +117,24 @@
  *  or if the URL is malformed.
  * The incoming URI should be properly escaped (no raw spaces, etc. URI percent-encoding is expected).
  */
-- (NSString *)filesystemPathForURL:(CDVFilesystemURL *)url
+- (NSString *)filesystemPathForURL:(CDVFsgbFilesystemURL *)url
 {
     return [self filesystemPathForFullPath:url.fullPath];
 }
 
-- (CDVFilesystemURL *)URLforFullPath:(NSString *)fullPath
+- (CDVFsgbFilesystemURL *)URLforFullPath:(NSString *)fullPath
 {
     if (fullPath) {
         NSString* escapedPath = [fullPath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         if ([fullPath hasPrefix:@"/"]) {
-            return [CDVFilesystemURL fileSystemURLWithString:[NSString stringWithFormat:@"%@://localhost/%@%@", kCDVFilesystemURLPrefix, self.name, escapedPath]];
+            return [CDVFsgbFilesystemURL fileSystemURLWithString:[NSString stringWithFormat:@"%@://localhost/%@%@", kCDVFsgbFilesystemURLPrefix, self.name, escapedPath]];
         }
-        return [CDVFilesystemURL fileSystemURLWithString:[NSString stringWithFormat:@"%@://localhost/%@/%@", kCDVFilesystemURLPrefix, self.name, escapedPath]];
+        return [CDVFsgbFilesystemURL fileSystemURLWithString:[NSString stringWithFormat:@"%@://localhost/%@/%@", kCDVFsgbFilesystemURLPrefix, self.name, escapedPath]];
     }
     return nil;
 }
 
-- (CDVFilesystemURL *)URLforFilesystemPath:(NSString *)path
+- (CDVFsgbFilesystemURL *)URLforFilesystemPath:(NSString *)path
 {
     return [self URLforFullPath:[self fullPathForFileSystemPath:path]];
 
@@ -177,7 +177,7 @@
     return bNumber;
 }
 
-- (CDVPluginResult *)getFileForURL:(CDVFilesystemURL *)baseURI requestedPath:(NSString *)requestedPath options:(NSDictionary *)options
+- (CDVPluginResult *)getFileForURL:(CDVFsgbFilesystemURL *)baseURI requestedPath:(NSString *)requestedPath options:(NSDictionary *)options
 {
     CDVPluginResult* result = nil;
     BOOL bDirRequest = NO;
@@ -205,7 +205,7 @@
         // silently removed.
         NSString *combinedPath = [baseURI.fullPath stringByAppendingPathComponent:requestedPath];
         combinedPath = [self normalizePath:combinedPath];
-        CDVFilesystemURL* requestedURL = [self URLforFullPath:combinedPath];
+        CDVFsgbFilesystemURL* requestedURL = [self URLforFullPath:combinedPath];
 
         NSFileManager* fileMgr = [[NSFileManager alloc] init];
         BOOL bIsDir;
@@ -255,15 +255,15 @@
 
 }
 
-- (CDVPluginResult*)getParentForURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult*)getParentForURL:(CDVFsgbFilesystemURL *)localURI
 {
     CDVPluginResult* result = nil;
-    CDVFilesystemURL *newURI = nil;
+    CDVFsgbFilesystemURL *newURI = nil;
     if ([localURI.fullPath isEqualToString:@""]) {
         // return self
         newURI = localURI;
     } else {
-        newURI = [CDVFilesystemURL fileSystemURLWithURL:[localURI.url URLByDeletingLastPathComponent]]; /* TODO: UGLY - FIX */
+        newURI = [CDVFsgbFilesystemURL fileSystemURLWithURL:[localURI.url URLByDeletingLastPathComponent]]; /* TODO: UGLY - FIX */
     }
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
     BOOL bIsDir;
@@ -277,7 +277,7 @@
     return result;
 }
 
-- (CDVPluginResult*)setMetadataForURL:(CDVFilesystemURL *)localURI withObject:(NSDictionary *)options
+- (CDVPluginResult*)setMetadataForURL:(CDVFsgbFilesystemURL *)localURI withObject:(NSDictionary *)options
 {
     BOOL ok = NO;
 
@@ -330,7 +330,7 @@
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         } else {
             // see if we can give a useful error
-            CDVFileError errorCode = ABORT_ERR;
+            CDVFsgbFileError errorCode = ABORT_ERR;
             NSLog(@"error removing filesystem entry at %@: %@", fullPath, [pError localizedDescription]);
             if ([pError code] == NSFileNoSuchFileError) {
                 errorCode = NOT_FOUND_ERR;
@@ -347,7 +347,7 @@
     return result;
 }
 
-- (CDVPluginResult *)removeFileAtURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult *)removeFileAtURL:(CDVFsgbFilesystemURL *)localURI
 {
     NSString *fileSystemPath = [self filesystemPathForURL:localURI];
 
@@ -364,7 +364,7 @@
     return [self doRemove:fileSystemPath];
 }
 
-- (CDVPluginResult *)recursiveRemoveFileAtURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult *)recursiveRemoveFileAtURL:(CDVFsgbFilesystemURL *)localURI
 {
     NSString *fileSystemPath = [self filesystemPathForURL:localURI];
     return [self doRemove:fileSystemPath];
@@ -388,7 +388,7 @@
 }
 
 
-- (CDVPluginResult *)readEntriesAtURL:(CDVFilesystemURL *)localURI
+- (CDVPluginResult *)readEntriesAtURL:(CDVFsgbFilesystemURL *)localURI
 {
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
     NSError* __autoreleasing error = nil;
@@ -431,18 +431,18 @@
     return newPos;
 }
 
-- (CDVPluginResult *)truncateFileAtURL:(CDVFilesystemURL *)localURI atPosition:(unsigned long long)pos
+- (CDVPluginResult *)truncateFileAtURL:(CDVFsgbFilesystemURL *)localURI atPosition:(unsigned long long)pos
 {
     unsigned long long newPos = [self truncateFile:[self filesystemPathForURL:localURI] atPosition:pos];
     return [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:(int)newPos];
 }
 
-- (CDVPluginResult *)writeToFileAtURL:(CDVFilesystemURL *)localURL withData:(NSData*)encData append:(BOOL)shouldAppend
+- (CDVPluginResult *)writeToFileAtURL:(CDVFsgbFilesystemURL *)localURL withData:(NSData*)encData append:(BOOL)shouldAppend
 {
     NSString *filePath = [self filesystemPathForURL:localURL];
 
     CDVPluginResult* result = nil;
-    CDVFileError errCode = INVALID_MODIFICATION_ERR;
+    CDVFsgbFileError errCode = INVALID_MODIFICATION_ERR;
     int bytesWritten = 0;
 
     if (filePath) {
@@ -506,7 +506,7 @@
     return copyOK;
 }
 
-- (void)copyFileToURL:(CDVFilesystemURL *)destURL withName:(NSString *)newName fromFileSystem:(NSObject<CDVFileSystem> *)srcFs atURL:(CDVFilesystemURL *)srcURL copy:(BOOL)bCopy callback:(void (^)(CDVPluginResult *))callback
+- (void)copyFileToURL:(CDVFsgbFilesystemURL *)destURL withName:(NSString *)newName fromFileSystem:(NSObject<CDVFsgbFileSystem> *)srcFs atURL:(CDVFsgbFilesystemURL *)srcURL copy:(BOOL)bCopy callback:(void (^)(CDVPluginResult *))callback
 {
     NSFileManager *fileMgr = [[NSFileManager alloc] init];
     NSString *destRootPath = [self filesystemPathForURL:destURL];
@@ -607,7 +607,7 @@
         }
     } else {
         // Need to copy the hard way
-        [srcFs readFileAtURL:srcURL start:0 end:-1 callback:^(NSData* data, NSString* mimeType, CDVFileError errorCode) {
+        [srcFs readFileAtURL:srcURL start:0 end:-1 callback:^(NSData* data, NSString* mimeType, CDVFsgbFileError errorCode) {
             CDVPluginResult* result = nil;
             if (data != nil) {
                 BOOL bSuccess = [data writeToFile:newFileSystemPath atomically:YES];
@@ -664,7 +664,7 @@
     return mimeType;
 }
 
-- (void)readFileAtURL:(CDVFilesystemURL *)localURL start:(NSInteger)start end:(NSInteger)end callback:(void (^)(NSData*, NSString* mimeType, CDVFileError))callback
+- (void)readFileAtURL:(CDVFsgbFilesystemURL *)localURL start:(NSInteger)start end:(NSInteger)end callback:(void (^)(NSData*, NSString* mimeType, CDVFsgbFileError))callback
 {
     NSString *path = [self filesystemPathForURL:localURL];
 
@@ -688,7 +688,7 @@
     callback(readData, mimeType, readData != nil ? NO_ERROR : NOT_FOUND_ERR);
 }
 
-- (void)getFileMetadataForURL:(CDVFilesystemURL *)localURL callback:(void (^)(CDVPluginResult *))callback
+- (void)getFileMetadataForURL:(CDVFsgbFilesystemURL *)localURL callback:(void (^)(CDVPluginResult *))callback
 {
     NSString *path = [self filesystemPathForURL:localURL];
     CDVPluginResult *result;
@@ -719,7 +719,7 @@
 
     } else {
         // didn't get fileAttribs
-        CDVFileError errorCode = ABORT_ERR;
+        CDVFsgbFileError errorCode = ABORT_ERR;
         NSLog(@"error getting metadata: %@", [error localizedDescription]);
         if ([error code] == NSFileNoSuchFileError || [error code] == NSFileReadNoSuchFileError) {
             errorCode = NOT_FOUND_ERR;

@@ -21,9 +21,9 @@
 #import <Cordova/CDVPlugin.h>
 
 extern NSString* const kCDVAssetsLibraryPrefix;
-extern NSString* const kCDVFilesystemURLPrefix;
+extern NSString* const kCDVFsgbFilesystemURLPrefix;
 
-enum CDVFileError {
+enum CDVFsgbFileError {
     NO_ERROR = 0,
     NOT_FOUND_ERR = 1,
     SECURITY_ERR = 2,
@@ -38,9 +38,9 @@ enum CDVFileError {
     TYPE_MISMATCH_ERR = 11,
     PATH_EXISTS_ERR = 12
 };
-typedef int CDVFileError;
+typedef int CDVFsgbFileError;
 
-@interface CDVFilesystemURL : NSObject  {
+@interface CDVFsgbFilesystemURL : NSObject  {
     NSURL *_url;
     NSString *_fileSystemName;
     NSString *_fullPath;
@@ -48,8 +48,8 @@ typedef int CDVFileError;
 
 - (id) initWithString:(NSString*)strURL;
 - (id) initWithURL:(NSURL*)URL;
-+ (CDVFilesystemURL *)fileSystemURLWithString:(NSString *)strURL;
-+ (CDVFilesystemURL *)fileSystemURLWithURL:(NSURL *)URL;
++ (CDVFsgbFilesystemURL *)fileSystemURLWithString:(NSString *)strURL;
++ (CDVFsgbFilesystemURL *)fileSystemURLWithURL:(NSURL *)URL;
 
 - (NSString *)absoluteURL;
 
@@ -59,36 +59,36 @@ typedef int CDVFileError;
 
 @end
 
-@interface CDVFilesystemURLProtocol : NSURLProtocol
+@interface CDVFsgbFilesystemURLProtocol : NSURLProtocol
 @end
 
-@protocol CDVFileSystem
-- (CDVPluginResult *)entryForLocalURI:(CDVFilesystemURL *)url;
-- (CDVPluginResult *)getFileForURL:(CDVFilesystemURL *)baseURI requestedPath:(NSString *)requestedPath options:(NSDictionary *)options;
-- (CDVPluginResult *)getParentForURL:(CDVFilesystemURL *)localURI;
-- (CDVPluginResult *)setMetadataForURL:(CDVFilesystemURL *)localURI withObject:(NSDictionary *)options;
-- (CDVPluginResult *)removeFileAtURL:(CDVFilesystemURL *)localURI;
-- (CDVPluginResult *)recursiveRemoveFileAtURL:(CDVFilesystemURL *)localURI;
-- (CDVPluginResult *)readEntriesAtURL:(CDVFilesystemURL *)localURI;
-- (CDVPluginResult *)truncateFileAtURL:(CDVFilesystemURL *)localURI atPosition:(unsigned long long)pos;
-- (CDVPluginResult *)writeToFileAtURL:(CDVFilesystemURL *)localURL withData:(NSData*)encData append:(BOOL)shouldAppend;
-- (void)copyFileToURL:(CDVFilesystemURL *)destURL withName:(NSString *)newName fromFileSystem:(NSObject<CDVFileSystem> *)srcFs atURL:(CDVFilesystemURL *)srcURL copy:(BOOL)bCopy callback:(void (^)(CDVPluginResult *))callback;
-- (void)readFileAtURL:(CDVFilesystemURL *)localURL start:(NSInteger)start end:(NSInteger)end callback:(void (^)(NSData*, NSString* mimeType, CDVFileError))callback;
-- (void)getFileMetadataForURL:(CDVFilesystemURL *)localURL callback:(void (^)(CDVPluginResult *))callback;
+@protocol CDVFsgbFileSystem
+- (CDVPluginResult *)entryForLocalURI:(CDVFsgbFilesystemURL *)url;
+- (CDVPluginResult *)getFileForURL:(CDVFsgbFilesystemURL *)baseURI requestedPath:(NSString *)requestedPath options:(NSDictionary *)options;
+- (CDVPluginResult *)getParentForURL:(CDVFsgbFilesystemURL *)localURI;
+- (CDVPluginResult *)setMetadataForURL:(CDVFsgbFilesystemURL *)localURI withObject:(NSDictionary *)options;
+- (CDVPluginResult *)removeFileAtURL:(CDVFsgbFilesystemURL *)localURI;
+- (CDVPluginResult *)recursiveRemoveFileAtURL:(CDVFsgbFilesystemURL *)localURI;
+- (CDVPluginResult *)readEntriesAtURL:(CDVFsgbFilesystemURL *)localURI;
+- (CDVPluginResult *)truncateFileAtURL:(CDVFsgbFilesystemURL *)localURI atPosition:(unsigned long long)pos;
+- (CDVPluginResult *)writeToFileAtURL:(CDVFsgbFilesystemURL *)localURL withData:(NSData*)encData append:(BOOL)shouldAppend;
+- (void)copyFileToURL:(CDVFsgbFilesystemURL *)destURL withName:(NSString *)newName fromFileSystem:(NSObject<CDVFsgbFileSystem> *)srcFs atURL:(CDVFsgbFilesystemURL *)srcURL copy:(BOOL)bCopy callback:(void (^)(CDVPluginResult *))callback;
+- (void)readFileAtURL:(CDVFsgbFilesystemURL *)localURL start:(NSInteger)start end:(NSInteger)end callback:(void (^)(NSData*, NSString* mimeType, CDVFsgbFileError))callback;
+- (void)getFileMetadataForURL:(CDVFsgbFilesystemURL *)localURL callback:(void (^)(CDVPluginResult *))callback;
 
-- (NSDictionary *)makeEntryForLocalURL:(CDVFilesystemURL *)url;
+- (NSDictionary *)makeEntryForLocalURL:(CDVFsgbFilesystemURL *)url;
 - (NSDictionary*)makeEntryForPath:(NSString*)fullPath isDirectory:(BOOL)isDir;
 
 @property (nonatomic,strong) NSString *name;
 @property (nonatomic, copy) NSURL*(^urlTransformer)(NSURL*);
 
 @optional
-- (NSString *)filesystemPathForURL:(CDVFilesystemURL *)localURI;
-- (CDVFilesystemURL *)URLforFilesystemPath:(NSString *)path;
+- (NSString *)filesystemPathForURL:(CDVFsgbFilesystemURL *)localURI;
+- (CDVFsgbFilesystemURL *)URLforFilesystemPath:(NSString *)path;
 
 @end
 
-@interface CDVFile : CDVPlugin {
+@interface CDVFsgbFile : CDVPlugin {
     NSString* rootDocsPath;
     NSString* appDocsPath;
     NSString* appLibraryPath;
@@ -101,13 +101,13 @@ typedef int CDVFileError;
 - (NSNumber*)checkFreeDiskSpace:(NSString*)appPath;
 - (NSDictionary*)makeEntryForPath:(NSString*)fullPath fileSystemName:(NSString *)fsName isDirectory:(BOOL)isDir;
 - (NSDictionary *)makeEntryForURL:(NSURL *)URL;
-- (CDVFilesystemURL *)fileSystemURLforLocalPath:(NSString *)localPath;
+- (CDVFsgbFilesystemURL *)fileSystemURLforLocalPath:(NSString *)localPath;
 
-- (NSObject<CDVFileSystem> *)filesystemForURL:(CDVFilesystemURL *)localURL;
+- (NSObject<CDVFsgbFileSystem> *)filesystemForURL:(CDVFsgbFilesystemURL *)localURL;
 
 /* Native Registration API */
-- (void)registerFilesystem:(NSObject<CDVFileSystem> *)fs;
-- (NSObject<CDVFileSystem> *)fileSystemByName:(NSString *)fsName;
+- (void)registerFilesystem:(NSObject<CDVFsgbFileSystem> *)fs;
+- (NSObject<CDVFsgbFileSystem> *)fileSystemByName:(NSString *)fsName;
 
 /* Exec API */
 - (void)requestFileSystem:(CDVInvokedUrlCommand*)command;
@@ -136,7 +136,7 @@ typedef int CDVFileError;
 - (NSDictionary *)getDirectoryEntry:(NSString *)target isDirectory:(BOOL)bDirRequest;
 
 /* Conversion between filesystem paths and URLs */
-- (NSString *)filesystemPathForURL:(CDVFilesystemURL *)URL;
+- (NSString *)filesystemPathForURL:(CDVFsgbFilesystemURL *)URL;
 
 /* Internal methods for testing */
 - (void)_getLocalFilesystemPath:(CDVInvokedUrlCommand*)command;

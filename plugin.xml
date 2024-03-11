@@ -101,8 +101,8 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         </config-file>
         <header-file src="src/ios/CDVCapture.h" />
         <source-file src="src/ios/CDVCapture.m" />
-        <header-file src="src/ios/CDVFile.h" />
-        <source-file src="src/ios/CDVFile.m" />
+        <header-file src="src/ios/CDVFsgbFile.h" />
+        <source-file src="src/ios/CDVFsgbFile.m" />
         <header-file src="src/ios/CDVLocalFilesystem.h" />
         <source-file src="src/ios/CDVLocalFilesystem.m" />
         <header-file src="src/ios/CDVAssetLibraryFilesystem.h" />
