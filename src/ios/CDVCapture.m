@@ -18,7 +18,7 @@
  */
 
 #import "CDVCapture.h"
-#import "CDVFsgbFile.h"
+#import "CDVFile.h"
 #import <Cordova/CDVAvailability.h>
 
 #define kW3CMediaFormatHeight @"height"
@@ -423,9 +423,9 @@
     if (!mimeType || [mimeType isKindOfClass:[NSNull class]]) {
         // try to determine mime type if not provided
         id command = [self.commandDelegate getCommandInstance:@"File"];
-        bError = !([command isKindOfClass:[CDVFsgbFile class]]);
+        bError = !([command isKindOfClass:[CDVFile class]]);
         if (!bError) {
-            CDVFsgbFile* cdvFile = (CDVFsgbFile*)command;
+            CDVFile* cdvFile = (CDVFile*)command;
             mimeType = [cdvFile getMimeTypeFromPath:fullPath];
             if (!mimeType) {
                 // can't do much without mimeType, return error
@@ -504,14 +504,14 @@
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
     NSMutableDictionary* fileDict = [NSMutableDictionary dictionaryWithCapacity:6];
 
-    CDVFsgbFile *fs = [self.commandDelegate getCommandInstance:@"File"];
+    CDVFile *fs = [self.commandDelegate getCommandInstance:@"File"];
 
     // Get canonical version of localPath
     NSURL *fileURL = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@", fullPath]];
     NSURL *resolvedFileURL = [fileURL URLByResolvingSymlinksInPath];
     NSString *path = [resolvedFileURL path];
 
-    CDVFsgbFilesystemURL *url = [fs fileSystemURLforLocalPath:path];
+    CDVFilesystemURL *url = [fs fileSystemURLforLocalPath:path];
 
     [fileDict setObject:[fullPath lastPathComponent] forKey:@"name"];
     [fileDict setObject:fullPath forKey:@"fullPath"];
@@ -522,8 +522,8 @@
     NSString* mimeType = type;
     if (!mimeType) {
         id command = [self.commandDelegate getCommandInstance:@"File"];
-        if ([command isKindOfClass:[CDVFsgbFile class]]) {
-            CDVFsgbFile* cdvFile = (CDVFsgbFile*)command;
+        if ([command isKindOfClass:[CDVFile class]]) {
+            CDVFile* cdvFile = (CDVFile*)command;
             mimeType = [cdvFile getMimeTypeFromPath:fullPath];
         }
     }

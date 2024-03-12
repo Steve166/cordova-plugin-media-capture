@@ -21,7 +21,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 #import <Cordova/CDVPlugin.h>
-#import "CDVFsgbFile.h"
+#import "CDVFile.h"
 
 enum CDVCaptureError {
     CAPTURE_INTERNAL_ERR = 0,
