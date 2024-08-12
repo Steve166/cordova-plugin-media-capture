@@ -17,12 +17,12 @@
  under the License.
  */
 
-#import "CDVFsgbFile.h"
+#import "CDVFile.h"
 
 extern NSString* const kCDVAssetsLibraryPrefix;
 extern NSString* const kCDVAssetsLibraryScheme;
 
-@interface CDVAssetLibraryFilesystem : NSObject<CDVFsgbFileSystem> {
+@interface CDVAssetLibraryFilesystem : NSObject<CDVFileSystem> {
 }
 
 - (id) initWithName:(NSString *)name;
